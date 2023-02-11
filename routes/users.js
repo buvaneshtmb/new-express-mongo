@@ -2,6 +2,8 @@ var express = require("express");
 var router = express.Router();
 const { mongodb, MongoClient, dbName, dbUrl } = require("./../config/dbConfig");
 
+//Using Mongodb Connection
+
 router.get("/", async (req, res) => {
   const client = new MongoClient(dbUrl);
   await client.connect();
@@ -28,9 +30,7 @@ router.get("/:id", async (req, res) => {
   try {
     const db = await client.db(dbName);
     const collection = await db.collection("users");
-    const user = await collection
-      .findOne({ _id: mongodb.ObjectId(req.params.id) })
-      .project({ password: 0 });
+    const user = await collection.findOne({ _id: mongodb.ObjectId(req.params.id) }).project({ password: 0 });
     if (user) {
       res.status(200).send({
         data: user
@@ -70,10 +70,7 @@ router.post("/signup", async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(500).send({
-      message: "Internal Server Error",
-      error
-    });
+    res.status(500).send({message: "Internal Server Error",error});
   } finally {
     client.close();
   }
@@ -89,10 +86,7 @@ router.put("/edit-user/:id", async (req, res) => {
       _id: mongodb.ObjectId(req.params.id)
     });
     if (user) {
-      let user = await collection.updateOne(
-        { _id: mongodb.ObjectId(req.params.id) },
-        { $set: req.body }
-      );
+      let user = await collection.updateOne({ _id: mongodb.ObjectId(req.params.id) },{ $set: req.body });
       res.status(200).send({
         message: "User Updated"
       });
@@ -121,9 +115,7 @@ router.delete("/delete-user/:id", async (req, res) => {
       _id: mongodb.ObjectId(req.params.id)
     });
     if (user) {
-      let user = await collection.deleteOne({
-        _id: mongodb.ObjectId(req.params.id)
-      });
+      let user = await collection.deleteOne({id: mongodb.ObjectId(req.params.id)});
       res.status(200).send({
         message: "User Deleted"
       });
